@@ -48,6 +48,7 @@ class TraductorDFApp:
         self.is_selecting = False
         self.reader = None
         self.api_key_configurada = False
+        self.status_text = ""
         self.model = None
         self.history = []
 
@@ -154,7 +155,7 @@ class TraductorDFApp:
         content_frame = tk.Frame(self.main_frame, bg="black")
         content_frame.pack(fill="both", expand=True, padx=5)
 
-        self.spinner = LoadingSpinner(content_frame)
+        self.spinner = LoadingSpinner(content_frame, self)
 
         self.label_traduccion = tk.Label(content_frame, font=("Arial", 12), bg="black", fg="white", wraplength=780, justify="left")
         self.label_traduccion.pack(fill="both", expand=True)
@@ -259,6 +260,7 @@ class TraductorDFApp:
     def cargar_modelo_ocr(self):
         if not self.reader:
             try:
+                self.status_text = "Cargando OCR"
                 self.actualizar_overlay("Cargando modelo de OCR...", loading=True)
                 self.reader = easyocr.Reader(['en'])
                 self.actualizar_overlay("Modelo de OCR cargado. Listo para traducir.")
@@ -284,6 +286,7 @@ class TraductorDFApp:
 
     def _procesar_captura_thread(self):
         try:
+            self.status_text = "Traduciendo"
             screenshot = ImageGrab.grab(bbox=self.last_bbox)
             texto_extraido = "\n".join(self.reader.readtext(np.array(screenshot), detail=0, paragraph=True))
 
@@ -398,8 +401,9 @@ class TraductorDFApp:
         self.actualizar_overlay(mensaje)
 
 class LoadingSpinner:
-    def __init__(self, parent):
+    def __init__(self, parent, app_ref):
         self.parent = parent
+        self.app = app_ref
         self.spinner_frame = tk.Frame(parent, bg="black")
         self.loading_label = tk.Label(self.spinner_frame, text="", font=("Arial", 12), fg="white", bg="black")
         self.loading_label.pack(expand=True)
@@ -419,7 +423,8 @@ class LoadingSpinner:
     def animate(self):
         if self.is_spinning:
             char = self.spinner_chars[self.spinner_index]
-            self.loading_label.config(text=f"Traduciendo... {char}")
+            status_text = self.app.status_text
+            self.loading_label.config(text=f"{status_text}... {char}")
             self.spinner_index = (self.spinner_index + 1) % len(self.spinner_chars)
             self.parent.after(100, self.animate)
 
