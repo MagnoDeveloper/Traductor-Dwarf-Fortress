@@ -1,0 +1,6 @@
+pillow
+easyocr
+google-generativeai
+numpy
+torch
+torchvision
