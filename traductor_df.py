@@ -419,7 +419,7 @@ class LoadingSpinner:
     def animate(self):
         if self.is_spinning:
             char = self.spinner_chars[self.spinner_index]
-            self.loading_label.config(text=f"Traduciendo... {char}")
+            self.loading_label.config(text=f"Cargando OCR... {char}")
             self.spinner_index = (self.spinner_index + 1) % len(self.spinner_chars)
             self.parent.after(100, self.animate)
 
