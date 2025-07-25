@@ -10,7 +10,36 @@ import threading
 import ctypes
 import json
 
-import tkinter.tix as tix
+# import tkinter.tix as tix  # Eliminado
+
+class Tooltip:
+    def __init__(self, widget, text):
+        self.widget = widget
+        self.text = text
+        self.tipwindow = None
+        self.widget.bind("<Enter>", self.show_tip)
+        self.widget.bind("<Leave>", self.hide_tip)
+
+    def show_tip(self, event=None):
+        if self.tipwindow or not self.text:
+            return
+        x, y, cx, cy = self.widget.bbox("insert") if self.widget.winfo_ismapped() else (0, 0, 0, 0)
+        x = x + self.widget.winfo_rootx() + 25
+        y = y + self.widget.winfo_rooty() + 20
+        self.tipwindow = tw = tk.Toplevel(self.widget)
+        tw.wm_overrideredirect(True)
+        tw.wm_geometry(f"+{x}+{y}")
+        label = tk.Label(tw, text=self.text, justify=tk.LEFT,
+                         background="#333", foreground="white",
+                         relief=tk.SOLID, borderwidth=1,
+                         font=("Arial", 9))
+        label.pack(ipadx=5, ipady=2)
+
+    def hide_tip(self, event=None):
+        tw = self.tipwindow
+        self.tipwindow = None
+        if tw:
+            tw.destroy()
 
 class TraductorDFApp:
     def __init__(self, root):
@@ -115,12 +144,11 @@ class TraductorDFApp:
         self.setup_tooltips()
 
     def setup_tooltips(self):
-        tip = tix.Balloon(self.root)
-        tip.bind_widget(self.select_button, balloonmsg="Seleccionar un área de la pantalla para traducir (Ctrl+Q)")
-        tip.bind_widget(self.retry_button, balloonmsg="Reintentar la traducción del último área seleccionada (Ctrl+R)")
-        tip.bind_widget(self.clear_button, balloonmsg="Limpiar el texto de la traducción (Ctrl+W)")
-        tip.bind_widget(self.history_button, balloonmsg="Mostrar el historial de traducciones")
-        tip.bind_widget(self.config_button, balloonmsg="Abrir la ventana de configuración para establecer la API Key")
+        Tooltip(self.select_button, "Seleccionar un área de la pantalla para traducir (Ctrl+Q)")
+        Tooltip(self.retry_button, "Reintentar la traducción del último área seleccionada (Ctrl+R)")
+        Tooltip(self.clear_button, "Limpiar el texto de la traducción (Ctrl+W)")
+        Tooltip(self.history_button, "Mostrar el historial de traducciones")
+        Tooltip(self.config_button, "Abrir la ventana de configuración para establecer la API Key")
 
     def setup_content_area(self):
         content_frame = tk.Frame(self.main_frame, bg="black")
@@ -396,7 +424,7 @@ class LoadingSpinner:
             self.parent.after(100, self.animate)
 
 if __name__ == "__main__":
-    root = tix.Tk()
+    root = tk.Tk()
     app = TraductorDFApp(root)
     root.mainloop()
 
