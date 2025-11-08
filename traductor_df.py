@@ -83,7 +83,7 @@ class TraductorDFApp:
         if self.cargar_api_key():
             self.api_key_configurada = True
             try:
-                self.model = genai.GenerativeModel(model_name="gemini-1.5-flash")
+                self.model = genai.GenerativeModel(model_name="gemini-pro")
             except Exception as e:
                 self.actualizar_overlay(f"Error al configurar el modelo de IA: {e}")
 
