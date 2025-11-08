@@ -77,15 +77,15 @@ class TraductorDFApp:
                 with open(self.API_KEY_PATH, "w") as f:
                     f.write("")
             except Exception as e:
-                messagebox.showerror("Error", f"No se pudo crear el archivo api_key.txt: {e}")
-                self.root.quit()
+                print(f"Error al crear el archivo api_key.txt: {e}")
+                # No usamos messagebox aquí porque el GUI aún no está inicializado
 
         if self.cargar_api_key():
             self.api_key_configurada = True
             try:
-                self.model = genai.GenerativeModel(model_name="gemini-pro")
+                self.model = genai.GenerativeModel(model_name="gemini-2.5-flash")
             except Exception as e:
-                self.actualizar_overlay(f"Error al configurar el modelo de IA: {e}")
+                print(f"Error al configurar el modelo de IA: {e}")
 
     def cargar_api_key(self):
         try:
